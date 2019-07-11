@@ -104,6 +104,5 @@ public class DatabaseAccess extends AppCompatActivity {
     public void onBackPressed() {
         Intent intent = new Intent(DatabaseAccess.this, MainActivity.class);
         startActivity(intent);
-
     }
 }

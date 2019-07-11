@@ -14,11 +14,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.TextViewCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -28,37 +26,67 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 
-public class AboutPage  extends Fragment{
+public class AboutPage extends Fragment {
     private final Context mContext;
     private final LayoutInflater mInflater;
-    private final View mView;
+    private  View mView;
     private CharSequence mDescription;
     private int mImage = 0;
     private boolean mIsRTL = false;
     private Typeface mCustomFont;
 
+    public AboutPage(Context context) {
+        this.mContext = context;
+        this.mInflater = LayoutInflater.from(context);
+    }
+
     @Nullable
     @Override
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_about,container,false);
-
+       mView =  mInflater.inflate(R.layout.fragment_about, null);
+        Element adsElement = new Element();
+        adsElement.setTitle("Advertise with us");
+        isRTL(false)
+                .setImage(R.drawable.dummy_image)
+                .addItem(new Element().setTitle("Version 3.0"))
+                .addItem(adsElement)
+                .addGroup("Connect with us")
+                .addEmail("shreejashrestha15@gmail.com")
+                .addWebsite("http://medyo.github.io/")
+                .addFacebook("shreezastha")
+                .addTwitter(" ")
+                .addYoutube("UCdPQtdWIsg7_pi4mrRu46vA")
+                .addPlayStore("com.ideashower.readitlater.pro")
+                .addInstagram("shreeja.stha")
+                .addGitHub("shreeza")
+                .addItem(getCopyRightsElement());
+        return create();
     }
 
-
-
-
-
-    public AboutPage(Context context) {
-        this.mContext = context;
-        this.mInflater = LayoutInflater.from(context);
-        this.mView = mInflater.inflate(R.layout.fragment_about, null);
+    Element getCopyRightsElement() {
+        Element copyRightsElement = new Element();
+        final String copyrights = String.format(getString(R.string.copy_right), Calendar.getInstance().get(Calendar.YEAR));
+        copyRightsElement.setTitle(copyrights);
+        copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
+        copyRightsElement.setIconTint(R.color.about_item_text_color);
+        copyRightsElement.setIconNightTint(android.R.color.white);
+        copyRightsElement.setGravity(Gravity.CENTER);
+        copyRightsElement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), copyrights, Toast.LENGTH_SHORT).show();
+            }
+        });
+        return copyRightsElement;
     }
 
-
-    public AboutPage setCustomFont(String path){
+    public AboutPage setCustomFont(String path) {
         mCustomFont = Typeface.createFromAsset(mContext.getAssets(), path);
         return this;
     }
@@ -132,7 +160,6 @@ public class AboutPage  extends Fragment{
     public AboutPage addTwitter(String id) {
         return addTwitter(id, mContext.getString(R.string.about_twitter));
     }
-
 
 
     public AboutPage addTwitter(String id, String title) {
