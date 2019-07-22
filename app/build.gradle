@@ -16,6 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    // need this to store tflite models in assets
+    aaptOptions {
+        noCompress "tflite"
+        noCompress "lite"
+    }
     sourceSets { main { java.srcDirs = ['src/main/java', 'src/main/java/2'] } }
 }
 
@@ -31,7 +36,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //sqlite asset helper library
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-
+    implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
+    // TensorFlow lite dependency
+    api 'org.tensorflow:tensorflow-lite:+'
 
 }
 allprojects {

@@ -1,13 +1,14 @@
 package com.example.shailee.camo;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -29,11 +30,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.soundcloud.android.crop.Crop;
+
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,6 +47,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     String currentPhotoPath;
+    public String chosen;
+    private Uri imageUri;
+
+
+
+
 
     public static Bitmap toBitmap(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
@@ -56,14 +62,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        button = (Button) findViewById(R.id.button);
+        button=(Button)findViewById(R.id.button);
 
 
         drawerLayout = findViewById(R.id.drawer_layout);
         simulateDayNight(/* DAY */ 0);
         Element adsElement = new Element();
         adsElement.setTitle("Advertise with us");
-
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -75,21 +80,78 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
         //snap the image wala button
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
+            public void onClick(View view) {
+                // filename in assets
+                chosen = "inception_float.tflite";
+                // model in not quantized
+                openCameraIntent();
+
 
             }
         });
 
 
+
+
+
+
+
+
     }
+
+    public void openCameraIntent(){
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+        // tell camera where to store the resulting picture
+        imageUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        // start camera, and wait for it to finish
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        // if the camera activity is finished, obtained the uri, crop it to make it square, and send it to 'Classify' activity
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            try {
+                Uri source_uri = imageUri;
+                Uri dest_uri = Uri.fromFile(new File(getCacheDir(), "cropped"));
+                // need to crop it to square image as CNN's always required square input
+                Crop.of(source_uri,dest_uri).withAspect(400,600).start(this);
+
+                // Crop.of(source_uri, dest_uri).asSquare();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // if cropping acitivty is finished, get the resulting cropped image uri and send it to 'Classify' activity
+        else if(requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK){
+            imageUri = Crop.getOutput(data);
+            Intent i = new Intent(MainActivity.this, Classify.class);
+            // put image data in extras to send
+            i.putExtra("resID_uri", imageUri);
+            // put filename in extras
+            i.putExtra("chosen", chosen);
+            // put model type in extras
+//            i.putExtra("quant", quant);
+//            // send other required data
+            startActivity(i);
+        }
+    }
+
+
+
+
+
 
     //navigation drawer ko items selection..
     @Override
@@ -112,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 buttonOfQuery.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(getApplicationContext());
                         databaseAccess.open();
 
@@ -126,12 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         textView.setText(fancySentence);
 
-                        //   textView.setText(result);
-
-                        // byte[] b=databaseAccess.getImage(n);
-//                        BitmapFactory.Options options = new BitmapFactory.Options();
-//                        Bitmap bitmap = BitmapFactory.decodeByteArray(b, 0, b.length, options);
-                        //img.setImageBitmap(bitmap);
 
                         byte[] data = databaseAccess.getImage(n);
                         Bitmap image = toBitmap(data);
@@ -151,21 +208,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-
-    }
+    //@Override
+//    public void onBackPressed() {
+//        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+//
+//    }
 
     Element getCopyRightsElement() {
         Element copyRightsElement = new Element();
         final String copyrights = String.format(getString(R.string.copy_right), Calendar.getInstance().get(Calendar.YEAR));
         copyRightsElement.setTitle(copyrights);
-        copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
+       // copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
         copyRightsElement.setIconTint(R.color.about_item_text_color);
         copyRightsElement.setIconNightTint(android.R.color.white);
         copyRightsElement.setGravity(Gravity.CENTER);
@@ -200,29 +257,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 //to create image file...
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    //to save into image gallery...
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
+//    private File createImageFile() throws IOException {
+//        // Create an image file name
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "JPEG_" + timeStamp + "_";
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File image = File.createTempFile(
+//                imageFileName,  /* prefix */
+//                ".jpg",         /* suffix */
+//                storageDir      /* directory */
+//        );
+//
+//        // Save a file: path for use with ACTION_VIEW intents
+//        currentPhotoPath = image.getAbsolutePath();
+//        return image;
+//    }
+//
+//    //to save into image gallery...
+//    private void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+//    }
 
 }

@@ -73,7 +73,7 @@ public class AboutPage extends Fragment {
         Element copyRightsElement = new Element();
         final String copyrights = String.format(getString(R.string.copy_right), Calendar.getInstance().get(Calendar.YEAR));
         copyRightsElement.setTitle(copyrights);
-        copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
+       // copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
         copyRightsElement.setIconTint(R.color.about_item_text_color);
         copyRightsElement.setIconNightTint(android.R.color.white);
         copyRightsElement.setGravity(Gravity.CENTER);
@@ -100,7 +100,7 @@ public class AboutPage extends Fragment {
     public AboutPage addEmail(String email, String title) {
         Element emailElement = new Element();
         emailElement.setTitle(title);
-        emailElement.setIconDrawable(R.drawable.about_icon_email);
+        //emailElement.setIconDrawable(R.drawable.about_icon_email);
         emailElement.setIconTint(R.color.about_item_text_color);
 
         Intent intent = new Intent(Intent.ACTION_SENDTO);
@@ -122,7 +122,7 @@ public class AboutPage extends Fragment {
     public AboutPage addFacebook(String id, String title) {
         Element facebookElement = new Element();
         facebookElement.setTitle(title);
-        facebookElement.setIconDrawable(R.drawable.about_icon_facebook);
+       // facebookElement.setIconDrawable(R.drawable.about_icon_facebook);
         facebookElement.setIconTint(R.color.about_facebook_color);
         facebookElement.setValue(id);
 
@@ -165,7 +165,7 @@ public class AboutPage extends Fragment {
     public AboutPage addTwitter(String id, String title) {
         Element twitterElement = new Element();
         twitterElement.setTitle(title);
-        twitterElement.setIconDrawable(R.drawable.about_icon_twitter);
+      //  twitterElement.setIconDrawable(R.drawable.about_icon_twitter);
         twitterElement.setIconTint(R.color.about_twitter_color);
         twitterElement.setValue(id);
 
@@ -194,7 +194,7 @@ public class AboutPage extends Fragment {
     public AboutPage addPlayStore(String id, String title) {
         Element playStoreElement = new Element();
         playStoreElement.setTitle(title);
-        playStoreElement.setIconDrawable(R.drawable.about_icon_google_play);
+       // playStoreElement.setIconDrawable(R.drawable.about_icon_google_play);
         playStoreElement.setIconTint(R.color.about_play_store_color);
         playStoreElement.setValue(id);
 
@@ -221,7 +221,7 @@ public class AboutPage extends Fragment {
     public AboutPage addYoutube(String id, String title) {
         Element youtubeElement = new Element();
         youtubeElement.setTitle(title);
-        youtubeElement.setIconDrawable(R.drawable.about_icon_youtube);
+       // youtubeElement.setIconDrawable(R.drawable.about_icon_youtube);
         youtubeElement.setIconTint(R.color.about_youtube_color);
         youtubeElement.setValue(id);
 
@@ -248,7 +248,7 @@ public class AboutPage extends Fragment {
     public AboutPage addInstagram(String id, String title) {
         Element instagramElement = new Element();
         instagramElement.setTitle(title);
-        instagramElement.setIconDrawable(R.drawable.about_icon_instagram);
+       // instagramElement.setIconDrawable(R.drawable.about_icon_instagram);
         instagramElement.setIconTint(R.color.about_instagram_color);
         instagramElement.setValue(id);
 
@@ -275,7 +275,7 @@ public class AboutPage extends Fragment {
     public AboutPage addGitHub(String id, String title) {
         Element gitHubElement = new Element();
         gitHubElement.setTitle(title);
-        gitHubElement.setIconDrawable(R.drawable.about_icon_github);
+       // gitHubElement.setIconDrawable(R.drawable.about_icon_github);
         gitHubElement.setIconTint(R.color.about_github_color);
         gitHubElement.setValue(id);
 
@@ -302,7 +302,7 @@ public class AboutPage extends Fragment {
         }
         Element websiteElement = new Element();
         websiteElement.setTitle(title);
-        websiteElement.setIconDrawable(R.drawable.about_icon_link);
+      //  websiteElement.setIconDrawable(R.drawable.about_icon_link);
         websiteElement.setIconTint(R.color.about_item_text_color);
         websiteElement.setValue(url);
 

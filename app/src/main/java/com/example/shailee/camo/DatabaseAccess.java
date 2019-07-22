@@ -7,19 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 
-public class DatabaseAccess extends AppCompatActivity {
+public class DatabaseAccess extends AppCompatActivity  {
     private DatabaseOpenHelper openHelper;
     private SQLiteDatabase db;
     private static DatabaseAccess instance;
     Cursor c= null;
     Cursor d=null;
     ImageView img;
+
+
 
 
     //private constructor creation so that this class wont be accessed or instantiated by any other classses
@@ -105,4 +105,6 @@ public class DatabaseAccess extends AppCompatActivity {
         Intent intent = new Intent(DatabaseAccess.this, MainActivity.class);
         startActivity(intent);
     }
+
+
 }
