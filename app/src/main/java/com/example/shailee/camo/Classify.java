@@ -8,9 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -61,8 +63,8 @@ public class Classify extends AppCompatActivity{
     private String chosen;
 
     // input image dimensions for the Inception Model
-    private int DIM_IMG_SIZE_X = 299;
-    private int DIM_IMG_SIZE_Y = 299;
+    private int DIM_IMG_SIZE_X = 224;
+    private int DIM_IMG_SIZE_Y = 224;
     private int DIM_PIXEL_SIZE = 3;
 
     // int array to hold image data
@@ -116,7 +118,7 @@ public class Classify extends AppCompatActivity{
 
         imgData =
                 ByteBuffer.allocateDirect(
-                        4 * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
+                        4 *DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
 
         imgData.order(ByteOrder.nativeOrder());
         labelProbArray = new float[1][labelList.size()];
@@ -161,10 +163,22 @@ public class Classify extends AppCompatActivity{
                 convertBitmapToByteBuffer(bitmap);
                 // pass byte data to the graph
 
-                tflite.run(imgData, labelProbArray);
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        tflite.run(imgData,labelProbArray);
+                        // display the results
 
-                // display the results
-                printTopKLabels();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                printTopKLabels();
+                            }
+                        });
+                    }
+                });
+
+
             }
         });
 
@@ -192,6 +206,7 @@ public class Classify extends AppCompatActivity{
 
     // converts bitmap to byte array which is passed in the tflite graph
     private void convertBitmapToByteBuffer(Bitmap bitmap) {
+
         if (imgData == null) {
             return;
         }
@@ -242,6 +257,7 @@ public class Classify extends AppCompatActivity{
             topLables[i] = label.getKey();
             topConfidence[i] = String.format("%.0f%%",label.getValue()*100);
         }
+        Log.d("output", "printTopKLabels:"+topLables[2]);
         // set the corresponding textviews with the results
         label1.setText("1. "+topLables[2]);
         label2.setText("2. "+topLables[1]);

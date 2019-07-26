@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 // filename in assets
-                chosen = "inception_float.tflite";
+                chosen = "model.tflite";
                 // model in not quantized
                 openCameraIntent();
 

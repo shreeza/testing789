@@ -40,6 +40,7 @@ dependencies {
     // TensorFlow lite dependency
     api 'org.tensorflow:tensorflow-lite:+'
 
+
 }
 allprojects {
 repositories{
